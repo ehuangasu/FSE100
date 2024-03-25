@@ -80,7 +80,7 @@ def loop():
 			buzzTime = 1
 		if dis < 100 and dis >= 50:
 			buzzTime = 0.5
-		if dis < 50 amd dis >= 0:
+		if dis < 50 and dis >= 0:
 			buzzTime = 0.25
 		
 		# Every buzzTime seconds, flip the vibration motor state
@@ -103,3 +103,4 @@ if __name__ == '__main__':     # Program start from here
 		loop()
 	except KeyboardInterrupt:  # When 'Ctrl+C' is pressed, the child program destroy() will be executed.
 		destroy()
+
