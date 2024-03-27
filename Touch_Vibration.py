@@ -2,15 +2,15 @@
 import RPi.GPIO as GPIO
 import time
 
-PIR = 11
+TOUCH = 11
 BUZZ = 12
 
 # Setup board
 def setup():
 	GPIO.setmode(GPIO.BOARD)       # Numbers GPIOs by physical location
 	GPIO.setup(BUZZ, GPIO.OUT)     # Set Buzzer Led Pin mode to output
-	GPIO.setup(PIR, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
-	GPIO.add_event_detect(PIR, GPIO.BOTH, callback=detect)
+	GPIO.setup(TOUCH, GPIO.IN, pull_up_down=GPIO.PUD_UP)    # Set BtnPin's mode is input, and pull up to high level(3.3V)
+	GPIO.add_event_detect(TOUCH, GPIO.BOTH, callback=detect)
 	off(); # Ensure buzzer is off
 	
 def on():
@@ -27,9 +27,9 @@ def beep(x):
 
 # Detect change in input
 def detect(chn):
-	if GPIO.input(PIR) == 1:
+	if GPIO.input(TOUCH) == 1:
 		beep()
-	if GPIO.input(PIR) == 0:
+	if GPIO.input(TOUCH) == 0:
 		beep()
 		beep()
 
