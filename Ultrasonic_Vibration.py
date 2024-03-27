@@ -29,10 +29,10 @@ def distance():
 	GPIO.output(TRIG, 0)
 
 	
-	startTime = time.time()
 	while GPIO.input(ECHO) == 0:
-		startTime = time.time()  
+		pass
 
+	startTime = time.time()  
 	stopTime = time.time()
 	while GPIO.input(ECHO) == 1:
 		stopTime = time.time()
@@ -43,13 +43,11 @@ def distance():
 	duration = stopTime - startTime
 	return duration * 340 / 2 * 100 # Use speed of sound, 340m/s to get distance (convert m to cm)
 
-# Turns vibration motor on
 def on():
 	global buzzState
 	GPIO.output(BUZZ, GPIO.HIGH)
 	buzzState = True
 
-# Turns vibration motor off
 def off():
 	global buzzState
 	GPIO.output(BUZZ, GPIO.LOW)
