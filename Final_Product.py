@@ -36,8 +36,8 @@ def setup():
 	GPIO.setup(ALARM, GPIO.OUT)
 	GPIO.setup(TOUCH1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 	GPIO.setup(TOUCH2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-	GPIO.add_event_detect(TOUCH1, GPIO.BOTH, callback=detectTouch1)
-	GPIO.add_event_detect(TOUCH2, GPIO.BOTH, callback=detectTouch2)
+	GPIO.add_event_detect(TOUCH1, GPIO.FALLING, callback=detectTouch1)
+	GPIO.add_event_detect(TOUCH2, GPIO.FALLING, callback=detectTouch2)
 	GPIO.setup(BUZZTOUCH, GPIO.OUT)
 	offBuzz();        # Buzzer off
 	offAlarm();       # Alarm off
@@ -93,6 +93,7 @@ def offTouch():
 	GPIO.output(BUZZTOUCH, GPIO.LOW)
 
 def beep():
+	print('beep');
 	onTouch()
 	time.sleep(0.25)
 	offTouch()
@@ -101,25 +102,21 @@ def beep():
 # Detect touch switch
 def detectTouch1(chn):
 	global canBuzz
-	if GPIO.input(TOUCH1) == 1:
-		canBuzz = True
-		beep()
-	if GPIO.input(TOUCH1) == 0:
-		canBuzz = False
+	if canBuzz:
 		beep()
 		beep()
+	else:
+		beep()
+	canBuzz = not canBuzz
 
 def detectTouch2(chn):
 	global canAlarm
-	if GPIO.input(TOUCH2) == 1:
-		canAlarm = True
-		offBuzz()
-		beep()
-	if GPIO.input(TOUCH2) == 0:
-		canAlarm = False
-		offAlarm()
+	if canAlarm:
 		beep()
 		beep()
+	else:
+		beep()
+	canAlarm = not canAlarm
 
 # PIR Detect
 def detectPir(chn):
