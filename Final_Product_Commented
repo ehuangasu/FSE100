@@ -156,12 +156,13 @@ def loop():
 				lastDistCheck = time.time()
 
 			# Change buzzTime based on distance
-			buzzTime = None
+			if dis >= 200:
+				buzzTime = None
 			if dis < 200 and dis >= 100:
 				buzzTime = 1
 			if dis < 100 and dis >= 50:
 				buzzTime = 0.5
-			if dis < 50 and dis >= 0:
+			if dis < 50:
 				buzzTime = 0.25
 			
 			# Every buzzTime seconds, flip the vibration motor state
