@@ -2,6 +2,7 @@
 import RPi.GPIO as GPIO
 import time
 
+# GPIO Ports
 TRIG1 = 17
 ECHO1 = 22
 TRIG2 = 5
@@ -14,10 +15,12 @@ TOUCH1 = 25
 TOUCH2 = 16
 BUZZTOUCH = 21
 
+# Ultrasonic buzzer variables
 buzzState = False
 lastBuzzTime = 0
 lastDistCheck = 0
 
+# System on/off variables
 canBuzz = False
 canAlarm = False
 
@@ -41,27 +44,27 @@ def setup():
 	GPIO.setup(BUZZTOUCH, GPIO.OUT)
 	offBuzz();        # Buzzer off
 	offAlarm();       # Alarm off
-	offTouch();   # Touch Buzzer off
+	offTouch();       # Touch Buzzer off
 	print('on');
 
 # Ultrasonic distance
-def distance(t, e):
-	GPIO.output(t, 0)
+def distance(TRIG, ECHO):
+	GPIO.output(TRIG, 0)
 	time.sleep(0.00002)
 
-    # Ultrasonic sensor outputs
-	GPIO.output(t, 1)
+	# Ultrasonic sensor outputs
+	GPIO.output(TRIG, 1)
 	time.sleep(0.00001)
-	GPIO.output(t, 0)
+	GPIO.output(TRIG, 0)
 
 	startTime = time.time()  
-	while GPIO.input(e) == 0:
+	while GPIO.input(ECHO) == 0:
 		if time.time() - startTime > 1:  # If no echo sent
 			return 8888
 	startTime = time.time()  
 	
 	stopTime = time.time()
-	while GPIO.input(e) == 1:
+	while GPIO.input(ECHO) == 1:
 		stopTime = time.time()
 		if stopTime - startTime > 0.1:  # If no echo received
 			return 9999  
@@ -70,28 +73,34 @@ def distance(t, e):
 	duration = stopTime - startTime
 	return duration * 340 / 2 * 100 # Use speed of sound, 340m/s to get distance (convert m to cm)
 
+# Buzzer on/off/flip
 def onBuzz():
 	global buzzState
 	GPIO.output(BUZZ, GPIO.HIGH)
 	buzzState = True
-
 def offBuzz():
 	global buzzState
 	GPIO.output(BUZZ, GPIO.LOW)
 	buzzState = False
+def flip():
+	if buzzState:
+		offBuzz()
+	else:
+		onBuzz()
 
+# Alarm on/off (LOW is on)
 def onAlarm():
 	GPIO.output(ALARM, GPIO.LOW)
-
 def offAlarm():
 	GPIO.output(ALARM, GPIO.HIGH)
-	
+
+# Touch Switch buzzer on/off
 def onTouch():
 	GPIO.output(BUZZTOUCH, GPIO.HIGH)
-
 def offTouch():
 	GPIO.output(BUZZTOUCH, GPIO.LOW)
 
+# Touch switch buzzer buzz
 def beep():
 	print('beep');
 	onTouch()
@@ -99,7 +108,7 @@ def beep():
 	offTouch()
 	time.sleep(0.1)
 
-# Detect touch switch
+# Detect touch switch and change whether it can buzz
 def detectTouch1(chn):
 	global canBuzz
 	if canBuzz:
@@ -109,6 +118,7 @@ def detectTouch1(chn):
 		beep()
 	canBuzz = not canBuzz
 
+# Detect touch switch and change whether it can alarm
 def detectTouch2(chn):
 	global canAlarm
 	if canAlarm:
@@ -120,19 +130,15 @@ def detectTouch2(chn):
 
 # PIR Detect
 def detectPir(chn):
+	# Turn alarm on if any PIR detects something
 	if (GPIO.input(PIR1) == 1 or GPIO.input(PIR2) == 1) and canAlarm:
 		print('detect')
 		onAlarm()
+
+	# Turn alarm off if both PIRs detect nothing
 	if GPIO.input(PIR1) == 0 and GPIO.input(PIR2) == 0 and canAlarm:
 		print('detect end')
 		offAlarm()
-
-# Flips vibration motor
-def flip():
-	if buzzState:
-		offBuzz()
-	else:
-		onBuzz()
 
 def loop():
 	global lastDistCheck
@@ -143,6 +149,7 @@ def loop():
 		if canBuzz:
 			# Every 0.25 seconds, get distance
 			if time.time() - lastDistCheck > 0.25:
+				# Get minimum distance of the two sensors
 				dis = min(distance(TRIG1, ECHO1), distance(TRIG2, ECHO2))
 				print(f"{dis:.2f} cm")
 				lastDistCheck = time.time()
@@ -171,7 +178,7 @@ def loop():
 def destroy():
 	offBuzz();        # Buzzer off
 	offAlarm();       # Alarm off
-	offTouch();   # Touch Buzzer off
+	offTouch();       # Touch Buzzer off
 	GPIO.cleanup()    # Release resource
 	print('off')
 
