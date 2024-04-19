@@ -130,15 +130,16 @@ def detectTouch2(chn):
 
 # PIR Detect
 def detectPir(chn):
-	# Turn alarm on if any PIR detects something
-	if (GPIO.input(PIR1) == 1 or GPIO.input(PIR2) == 1) and canAlarm:
-		print('detect')
-		onAlarm()
-
-	# Turn alarm off if both PIRs detect nothing
-	if GPIO.input(PIR1) == 0 and GPIO.input(PIR2) == 0 and canAlarm:
-		print('detect end')
-		offAlarm()
+	if canAlarm:
+		# Turn alarm on if any PIR detects something
+		if (GPIO.input(PIR1) == 1 or GPIO.input(PIR2) == 1):
+			print('detect')
+			onAlarm()
+	
+		# Turn alarm off if both PIRs detect nothing
+		if GPIO.input(PIR1) == 0 and GPIO.input(PIR2) == 0:
+			print('detect end')
+			offAlarm()
 
 def loop():
 	global lastDistCheck
